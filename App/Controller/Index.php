@@ -10,19 +10,19 @@ namespace App\Controller;
 
 
 use Core\Controller;
+use Core\Manage;
 use Core\Map;
 use Core\Organisms;
 
 class Index extends Controller
 {
     function index(){
-        $map = new Map(100,100);
-        $map->setMapObj(1,1,Organisms::class);
-        $map->setMapObj(3,1,Organisms::class);
-        $map->setMapObj(1,9,Organisms::class);
-        $map->setMapObj(8,6,Organisms::class);
-        $map->setMapObj(3,100,Organisms::class);
-        $map->mapToString();
+        ini_set('memory_limit','3072M');
+        $manage = new Manage(10,10);
+//        $map->setMapObj(3,100,Organisms::class);
+        $manage->generateMap();
+        $manage->getMap()->mapToString();
+//        var_dump((memory_get_usage()/1024/1024)."M");
 //        var_dump($map);
     }
 

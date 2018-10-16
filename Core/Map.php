@@ -11,46 +11,14 @@ namespace Core;
 
 class Map
 {
-    use Singleton;
     protected $w, $h;
     protected $map;
 
-
-    public function __construct($w, $h)
+    public function __construct($w=10, $h=10)
     {
         $this->w   = $w;
         $this->h   = $h;
-        $this->map = new \SplFixedArray($w * $h);
-//        var_dump($this->map);
-        $this->generateMap();
-    }
-
-    public function generateMap()
-    {
-        for ($i = 0; $i < $this->w*$this->h; $i++) {
-            $x = (int)($i%$this->w)+1;
-            $y = (int)($i/$this->h)+1;
-//            var_dump($x,$y);
-//            echo $i;
-//            echo "\n";
-            if ($i==64){
-//                var_dump($x,$y);
-            }
-            $this->setMapObj($x,$y,Road::class);
-        }
-    }
-
-
-    public function setMapObj($x, $y,$class_name)
-    {
-        if ($this->countCoordinatePosition([$x,$y])>9999){
-            echo $x." and ".$y;
-            echo "result:".$this->countCoordinatePosition([$x,$y]);
-            echo "\n";
-            return;
-        }
-//        var_dump($this->countCoordinatePosition([$x,$y]));
-        $this->map[$this->countCoordinatePosition([$x,$y])] = new $class_name($x,$y,$this);
+        $this->map = [];
     }
 
     public function getWH(){
@@ -95,7 +63,7 @@ class Map
      */
     public function getObj($x, $y)
     {
-        return $this->map[$x * $y - 1];
+        return $this->map[$x .'_'. $y ];
     }
 
     /**
@@ -114,8 +82,8 @@ class Map
         $start_2 = $this->countCoordinatePosition($lB);
         $end_2 =  $this->countCoordinatePosition($rB);
 
-        $arr1 = array_slice($this->map->toArray(),$start_1,$end_1-$start_1+1);
-        $arr2 = array_slice($this->map->toArray(),$start_2,$end_2-$start_2+1);
+        $arr1 = array_slice($this->map,$start_1,$end_1-$start_1+1);
+        $arr2 = array_slice($this->map,$start_2,$end_2-$start_2+1);
         return array_merge($arr1,$arr2);
     }
 
@@ -124,11 +92,14 @@ class Map
     }
 
     public function mapToString(){
-        foreach ($this->map->toArray() as$key=>$value){
-            if (($key)%$this->w==0){
-//                echo $key;
+//        var_dump($this->map);
+        $i = 0;
+        foreach ($this->map as $key=>$obj_levels){
+            if (($i)%$this->w==0){
                 echo "\n";
             }
+            krsort($obj_levels);
+            $value = current($obj_levels);
             if ($value instanceof Road){
                 echo " [] ";
             }elseif ($value instanceof Organisms){
@@ -136,14 +107,21 @@ class Map
             }else{
                 echo " ++ ";
             }
-
-
+            $i++;
 
         }
+    }
 
-
-
-
+    /**
+     * 设置地图对象
+     * @param $x
+     * @param $y
+     * @param $class_name
+     */
+    public function setMapObj(int $x, int $y,MapObj $class)
+    {
+        $this->map["{$x}_{$y}"][$class::$level] = $class;
+        return $class;
     }
 
 }

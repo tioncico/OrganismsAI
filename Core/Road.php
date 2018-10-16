@@ -11,6 +11,6 @@ namespace Core;
 
 class Road extends MapObj
 {
-    protected $level=1;
+    static $level=1;
 
 }
