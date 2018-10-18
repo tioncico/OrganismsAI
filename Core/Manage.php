@@ -20,7 +20,8 @@ class Manage
         $this->AI  = new AI();
     }
 
-    public function getMap(){
+    public function getMap()
+    {
         return $this->map;
     }
 
@@ -50,21 +51,22 @@ class Manage
      */
     public function randOrganisms($num)
     {
-        $wh = $this->map->getWH();
-        $map_w_num = range(1,$wh[0]);
-        $map_h_num = range(1,$wh[1]);
-        $x_arr_key = array_rand($map_w_num);
-        $y_arr_key = array_rand($map_h_num);
-        for ($i = 0; $i < $num; $i++) {
-            $map_obj = new Road(['coordinate' => [$x, $y]]);
-            $this->map->setMapObj($x, $y, $map_obj);
-            $map_obj->init($this->map, $this->AI);
-        }
+        $this->randMapObj($num,Organisms::class);
     }
 
-    public function randFood($num)
-    {
+    public function randFood($num){
+        $this->randMapObj($num,Food::class);
+    }
 
+    public function randMapObj($num,$mapObj){
+        $coordinates = $this->map->getMaps();
+        $array = array_rand($coordinates,$num);
+        foreach ($array as $coordinate_key){
+            $coordinate = explode('_',$coordinate_key);
+            $map_obj = new $mapObj(['coordinate' =>$coordinate ]);
+            $this->map->setMapObj($coordinate[0], $coordinate[1], $map_obj);
+            $map_obj->init($this->map, $this->AI);
+        }
     }
 
 

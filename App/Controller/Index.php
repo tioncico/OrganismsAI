@@ -21,6 +21,8 @@ class Index extends Controller
         $manage = new Manage(10,10);
 //        $map->setMapObj(3,100,Organisms::class);
         $manage->generateMap();
+        $manage->randOrganisms(10);
+        $manage->randFood(5);
         $manage->getMap()->mapToString();
 //        var_dump((memory_get_usage()/1024/1024)."M");
 //        var_dump($map);

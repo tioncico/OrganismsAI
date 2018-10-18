@@ -12,13 +12,23 @@ namespace Core;
 class Map
 {
     protected $w, $h;
-    protected $map;
+    protected $map = [];
 
     public function __construct($w=10, $h=10)
     {
         $this->w   = $w;
         $this->h   = $h;
-        $this->map = [];
+        $this->initMap();
+    }
+
+    public function initMap(){
+        $map_w_num = range(1, $this->w);
+        $map_h_num = range(1, $this->h);
+        foreach ($map_w_num as $x){
+            foreach ($map_h_num as $y){
+                $this->map["{$x}_{$y}"] = [];
+            }
+        }
     }
 
     public function getWH(){
@@ -105,10 +115,9 @@ class Map
             }elseif ($value instanceof Organisms){
                 echo " -- ";
             }else{
-                echo " ++ ";
+                echo " () ";
             }
             $i++;
-
         }
     }
 
@@ -122,6 +131,10 @@ class Map
     {
         $this->map["{$x}_{$y}"][$class::$level] = $class;
         return $class;
+    }
+
+    public function getMaps(){
+        return $this->map;
     }
 
 }

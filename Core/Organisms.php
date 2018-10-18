@@ -47,9 +47,5 @@ class Organisms extends MapObj
     public function init(Map $map, AI $AI)
     {
         $AI->organismsInit($this,$map);
-
-        var_dump($this->ability_data);
     }
-
-
 }

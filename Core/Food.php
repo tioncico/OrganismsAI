@@ -11,6 +11,6 @@ namespace Core;
 
 class Food extends MapObj
 {
-    protected $level=2;
+    static $level=2;
 
 }
