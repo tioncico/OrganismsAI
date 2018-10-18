@@ -12,5 +12,6 @@ namespace Core;
 class Food extends MapObj
 {
     static $level=2;
+    protected $type=SysConst::MAP_OBJ_FOOD;
 
 }

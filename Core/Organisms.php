@@ -18,6 +18,8 @@ class Organisms extends MapObj
 
     static $level = 2;
 
+    protected $type = SysConst::MAP_OBJ_O;
+
     protected $ability = [
         SysConst::ABILITY_MOVE, SysConst::ABILITY_EAT, SysConst::ABILITY_ATTACK, SysConst::ABILITY_ESCAPE
     ];//默认拥有能力

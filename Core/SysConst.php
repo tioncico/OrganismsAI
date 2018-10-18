@@ -30,7 +30,9 @@ class SysConst
     const MAP_MINE = 3;//自己
     const MAP_FOOD = 4;//吃的东西
 
-
+    const MAP_OBJ_ROAD =1;
+    const MAP_OBJ_O =2;
+    const MAP_OBJ_FOOD =3;
 
 
 }

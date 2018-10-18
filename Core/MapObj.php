@@ -17,6 +17,8 @@ class MapObj extends SplBean
 
     static $level = 0;
 
+    protected $type = 0;
+
     public function coordinateToString(){
         return $this->coordinate[0].'_'.$this->coordinate[1];
     }

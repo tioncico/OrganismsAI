@@ -12,5 +12,5 @@ namespace Core;
 class Road extends MapObj
 {
     static $level=1;
-
+    protected $type=SysConst::MAP_OBJ_ROAD;
 }

@@ -15,7 +15,7 @@ class AI
     protected $map_w, $map_h;
     protected $map;
 
-    public function init(Map $map)
+    public function __construct(Map $map)
     {
         $this->map_w = $map->getWH()[0];
         $this->map_h = $map->getWH()[1];
@@ -64,36 +64,40 @@ class AI
         return $ability_data;
     }
 
-
     /**
      * 获取地图视野的所有对象
      */
     public function getMapObjs($coordinate, $view)
     {
-        $map_data     = [];
+//        var_dump($coordinate);
+//        $map_data     = [];
         $coordinate_1 = [$coordinate[0] - $view, $coordinate[1] - $view];
         $coordinate_2 = [$coordinate[0] + $view, $coordinate[1] + $view];
         $coordinate_1 = $this->map->checkCoordinate($coordinate_1);
         $coordinate_2 = $this->map->checkCoordinate($coordinate_2);
         $map_objs     = $this->map->getObjs($coordinate_1, $coordinate_2);
-        foreach ($map_objs as $obj) {
-            if ($obj instanceof Road) {
-                $map_data[SysConst::MAP_ROAD][$obj->coordinateToString()] = $obj->toArray();
-            } elseif ($obj instanceof Organisms) {
-                if ($this === $obj) {
-                    $map_data[SysConst::MAP_MINE][$obj->coordinateToString()] = $obj->toArray();
-                } else {
-                    $map_data[SysConst::MAP_O][$obj->coordinateToString()] = $obj->toArray();
+        $map_data = [];
+        foreach ($map_objs as $level_array) {
+            foreach ($level_array as $obj){
+                if ($obj instanceof Road) {
+                    $map_data[SysConst::MAP_ROAD][$obj->coordinateToString()] = $obj->toArray();
+                } elseif ($obj instanceof Organisms) {
+                    if ($this === $obj) {
+                        $map_data[SysConst::MAP_MINE][$obj->coordinateToString()] = $obj->toArray();
+                    } else {
+                        $map_data[SysConst::MAP_O][$obj->coordinateToString()] = $obj->toArray();
+                    }
+                } elseif ($obj instanceof Food) {
+//                var_dump(66);
+                    $map_data[SysConst::MAP_FOOD][$obj->coordinateToString()] = $obj->toArray();
                 }
-            } elseif ($obj instanceof Food) {
-                $map_data[SysConst::MAP_FOOD][$obj->coordinateToString()] = $obj->toArray();
             }
         }
         return $map_data;
     }
 
     /**
-     * 获取移动指令
+     * 获取生命危及移动指令
      * @param Map $map
      */
     public function getMoveTypeForLife($coordinate, $map_data, $ability_data)
@@ -103,11 +107,12 @@ class AI
             'value' => ''
         ];
         //获取最近的食物
-        if (empty($map_dataa[SysConst::MAP_FOOD])) {
-            arsort($map_data[SysConst::ABILITY_MOVE]['move_priority']);
+//        var_dump($map_data[SysConst::MAP_FOOD]);
+        if (empty($map_data[SysConst::MAP_FOOD])) {
+            arsort($ability_data[SysConst::ABILITY_MOVE]['move_priority']);
             $array['value'] = key($ability_data[SysConst::ABILITY_MOVE]['move_priority']);
         } else {
-            array_multisort(array_column($map_data[SysConst::MAP_FOOD], 'distance'), SORT_NUMERIC, SORT_ASC, $map_data[SysConst::MAP_FOOD]);
+               array_multisort(array_column($map_data[SysConst::MAP_FOOD], 'distance'), SORT_NUMERIC, SORT_ASC, $map_data[SysConst::MAP_FOOD]);
             $coordinate_2   = current($map_data[SysConst::MAP_FOOD])['coordinate'];
             $array['value'] = $this->moveType($coordinate, $coordinate_2);
         }
@@ -139,23 +144,37 @@ class AI
         }
     }
 
-    public function ai()
+    /**
+     * 生物ai动作
+     * @return array
+     */
+    public function organismsAi(Organisms $organisms)
     {
-        $life_priority = $this->checkLifePriority($this->life);
+        //处理周围环境
+        $organisms->addProperty('map_data',$this->getMapObjs($organisms->getProperty('coordinate'),$organisms->getProperty('view')));
+
+        //判断生命权重
+        $life_priority = $this->checkLifePriority($organisms->getProperty('life'));
+//        var_dump($organisms->getProperty('life'));
         if ($life_priority >= 100) {
-            return $this->getMoveTypeForLife();
+//            var_dump($organisms->getProperty('coordinate'));
+            $array = $this->getMoveTypeForLife($organisms->getProperty('coordinate'),$organisms->getProperty('map_data'),$organisms->getProperty('ability_data'));
+//            var_dump($array);
         }
+
+
     }
 
     public function organismsInit(Organisms $organisms)
     {
         //修改移动优先级
-        $ability_data = $organisms->getProperty('ability_data');
+            $ability_data = $organisms->getProperty('ability_data');
         $ability_data[SysConst::ABILITY_MOVE]['move_priority'] = $this->countMoveAbility($organisms->getProperty('coordinate'), $ability_data[SysConst::ABILITY_MOVE]['move_priority']);
         $organisms->addProperty('ability_data',$ability_data);
+
+
         return true;
     }
-
 
 
 }

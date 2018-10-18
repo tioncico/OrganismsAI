@@ -8,7 +8,7 @@
 include "./vendor/autoload.php";
 include 'Conf/config.php';
 $a = new \App\Controller\Index();
-$a->index();
+$a->action();
 
 //$arr = range(0,99);
 //var_dump($arr);
