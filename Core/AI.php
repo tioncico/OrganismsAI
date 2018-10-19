@@ -123,7 +123,7 @@ class AI
      * 验证生命值优先级
      * @return bool|int
      */
-    public function checkLifePriority($life)
+    public function checkLifePriority  ($life)
     {
         if ($life >= 3) {
             return 0;//生命值正常
