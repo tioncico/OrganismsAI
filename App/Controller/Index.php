@@ -39,6 +39,8 @@ class Index extends Controller
         $manage->initData($map_data);
 //        var_dump($manage->getMap()->getMaps());
         $manage->ergodicObj();
+//        var_dump(json_encode($manage->getMap()->getMaps()));
+        file_put_contents('map.json',json_encode($manage->getMap()->getMaps()));
         $manage->getMap()->mapToString();
     }
 

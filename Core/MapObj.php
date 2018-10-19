@@ -23,7 +23,7 @@ class MapObj extends SplBean
         return $this->coordinate[0].'_'.$this->coordinate[1];
     }
 
-    public function init(Map $map,AI $AI){
+    public function init(AI $AI){
 
     }
 

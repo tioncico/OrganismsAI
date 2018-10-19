@@ -56,13 +56,13 @@ class Map
     public function checkCoordinate(array $coordinate)
     {
 //        var_dump($coordinate);
-        if ($coordinate[0] <=0) {
+        if ($coordinate[0] <= 0) {
             $coordinate[0] = 1;
         } elseif ($coordinate[0] > $this->w) {
             $coordinate[0] = $this->w;
         }
 
-        if ($coordinate[1] <=0) {
+        if ($coordinate[1] <= 0) {
             $coordinate[1] = 1;
         } elseif ($coordinate[1] > $this->h) {
             $coordinate[1] = $this->h;
@@ -105,20 +105,20 @@ class Map
     public function mapToString()
     {
         $i = 0;
-        foreach ($this->map as $key => $obj_levels) {
-            if (($i) % $this->w == 0) {
-                echo "\n";
+        for ($y = 1; $y <= $this->h; $y++) {
+            for ($x = 1; $x <= $this->w; $x++) {
+                $objs = $this->getObj($x, $y);
+                krsort($objs);
+                $obj = current($objs);
+                if ($obj instanceof Road) {
+                    echo " [] ";
+                } elseif ($obj instanceof Organisms) {
+                    echo " -- ";
+                } else {
+                    echo " () ";
+                }
             }
-            krsort($obj_levels);
-            $value = current($obj_levels);
-            if ($value instanceof Road) {
-                echo " [] ";
-            } elseif ($value instanceof Organisms) {
-                echo " -- ";
-            } else {
-                echo " () ";
-            }
-            $i++;
+            echo "\n";
         }
     }
 
@@ -139,4 +139,74 @@ class Map
         return $this->map;
     }
 
+    /**
+     * 移动地图对象
+     * @param int $move_type
+     * @param $num
+     * @param MapObj $map_obj
+     */
+    public function moveMapObj(int $move_type, $num, MapObj $map_obj)
+    {
+        $coordinate = $map_obj->getProperty('coordinate');
+//        var_dump($coordinate);
+        switch ($move_type) {
+            case SysConst::MOVE_TOP:
+                $coordinate[1] -= 1;
+                break;
+            case SysConst::MOVE_BOTTOM:
+                $coordinate[1] += 1;
+                break;
+            case SysConst::MOVE_LEFT:
+                $coordinate[0] -= 1;
+                break;
+            case SysConst::MOVE_RIGHT:
+                $coordinate[0] += 1;
+                break;
+        }
+        if ($coordinate[0] > $this->w || $coordinate[0] <= 0 || $coordinate[1] > $this->h || $coordinate[1] <= 0) {
+            throw new \Exception('坐标错误!');
+        }
+        //获取地图坐标的对象
+        $map_obj_arr = $this->getObj($coordinate[0], $coordinate[1]);
+//        var_dump($coordinate);
+        if (isset($map_obj_arr[$map_obj->getProperty('level')])) {
+            $this->impact($map_obj, $map_obj_arr[$map_obj->getProperty('level')]);
+        }else{
+            //先删除地图的该对象
+            $this->destroyMapObj($map_obj);
+            $map_obj->addProperty('coordinate',$coordinate);
+            //移动对象
+            $this->setMapObj($coordinate[0], $coordinate[1], $map_obj);
+        }
+        return $coordinate;
+    }
+
+    public function destroyMapObj(MapObj $mapObj)
+    {
+        unset($this->map[$mapObj->coordinateToString()][$mapObj->getProperty('type')]);
+    }
+
+    /**
+     * 碰撞效果
+     */
+    public function impact(MapObj $mapObj, MapObj $target)
+    {
+        var_dump($target->getProperty('type'));
+        switch ($target->getProperty('type')){
+            case SysConst::MAP_OBJ_ROAD:
+                break;
+            case SysConst::MAP_OBJ_O://如果是同类碰撞,则双方减少一格生命
+                $mapObj->setLife(-1);
+                $target->setLife(-1);
+                break;
+            case SysConst::MAP_OBJ_FOOD://销毁该食物,增加一个血,前进到该位置
+                $mapObj->setLife(1);
+                $this->destroyMapObj($target);
+                $coordinate = $target->getProperty('coordinate');
+                //移动对象
+                $this->setMapObj($coordinate[0], $coordinate[1], $mapObj);
+                var_dump(1);
+                break;
+        }
+    }
 }

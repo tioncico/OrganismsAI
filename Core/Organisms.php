@@ -37,17 +37,31 @@ class Organisms extends MapObj
         ],
     ];//能力保留数据
 
-    protected $map_data = [
-        SysConst::MAP_ROAD => ['obj' => [], 'distance' => []],
-        SysConst::MAP_O    => ['obj' => [], 'distance' => []],
-        SysConst::MAP_MINE => ['obj' => [], 'distance' => []],
-        SysConst::MAP_FOOD => ['obj' => [], 'distance' => []],
-    ];
-
-//    public function
-
-    public function init(Map $map, AI $AI)
+    public function init(AI $AI)
     {
-        $AI->organismsInit($this,$map);
+        $AI->organismsInit($this);
+    }
+
+    /**
+     * 更新饥饿值
+     * @param $num
+     * @return int
+     */
+    public function setHungry($num){
+        $this->hungry+=$num;
+        if($this->hungry<=0){
+            $this->setLife(-1);
+        }
+        return $this->hungry;
+    }
+
+    /**
+     * 设置生命,只要修改了什么,饥饿值直接补满
+     * @param $num
+     * @return mixed
+     */
+    public function setLife($num){
+        $this->hungry=50;
+        return $this->life+=$num;
     }
 }

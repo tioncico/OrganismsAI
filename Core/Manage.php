@@ -91,7 +91,7 @@ class Manage
             $coordinate = explode('_', $coordinate_key);
             $map_obj    = new $mapObj(['coordinate' => $coordinate]);
             $this->map->setMapObj($coordinate[0], $coordinate[1], $map_obj);
-            $map_obj->init($this->map, $this->AI);
+            $map_obj->init($this->AI);
         }
     }
 
@@ -104,6 +104,10 @@ class Manage
                         break;
                     case SysConst::MAP_O:
                         $this->AI->organismsAi($obj_arr);
+                        //如果生命值为0,则死亡释放对象
+                        if($obj_arr->getProperty('life')<=0){
+                            $this->map->destroyMapObj($obj_arr);
+                        }
                         break;
                     case SysConst::MAP_OBJ_FOOD:
                         break;
